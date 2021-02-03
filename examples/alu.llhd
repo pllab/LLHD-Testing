@@ -1,0 +1,118 @@
+proc %alu.param1.always.71.1 (i32$ %a, i32$ %b, i1$ %op) -> (i32$ %z) {
+init:
+    %a.prb = prb i32$ %a
+    %b.prb = prb i32$ %b
+    %op.prb = prb i1$ %op
+    wait %check, %a, %b, %op
+check:
+    %a.prb1 = prb i32$ %a
+    %impledge = neq i32 %a.prb, %a.prb1
+    %b.prb1 = prb i32$ %b
+    %impledge1 = neq i32 %b.prb, %b.prb1
+    %event_or = or i1 %impledge, %impledge1
+    %op.prb1 = prb i1$ %op
+    %impledge2 = neq i1 %op.prb, %op.prb1
+    %event_or1 = or i1 %event_or, %impledge2
+    br %event_or1, %init, %event
+event:
+    %0 = const i32 0
+    %zext = inss i32 %0, i1 %op.prb1, 0, 1
+    %1 = eq i32 %zext, %0
+    %2 = const i1 0
+    %3 = neq i1 %1, %2
+    %4 = const time 0s 1e
+    br %3, %if_false, %if_true
+if_true:
+    %5 = add i32 %a.prb1, %b.prb1
+    drv i32$ %z, %5, %4
+    br %init
+if_false:
+    %6 = sub i32 %a.prb1, %b.prb1
+    drv i32$ %z, %6, %4
+    br %init
+}
+
+entity @alu.param1 (i32$ %a, i32$ %b, i1$ %op) -> (i32$ %z) {
+    inst %alu.param1.always.71.1 (i32$ %a, i32$ %b, i1$ %op) -> (i32$ %z)
+}
+
+proc %top.initial.207.0 () -> (i32$ %a, i32$ %b, i1$ %op) {
+0:
+    %1 = prb i32$ %a
+    %a.shadow = var i32 %1
+    %2 = prb i32$ %b
+    %b.shadow = var i32 %2
+    %3 = prb i1$ %op
+    %op.shadow = var i1 %3
+    %4 = const time 1ns
+    wait %5 for %4
+5:
+    %6 = prb i32$ %a
+    st i32* %a.shadow, %6
+    %7 = prb i1$ %op
+    st i1* %op.shadow, %7
+    %8 = prb i32$ %b
+    st i32* %b.shadow, %8
+    %9 = const i32 1
+    %loop_count = var i32 %9
+    br %loop_body
+loop_body:
+    %10 = ld i32* %loop_count
+    %11 = const i32 0
+    %12 = neq i32 %10, %11
+    br %12, %loop_exit, %loop_continue
+loop_exit:
+    halt
+loop_continue:
+    %a.shadow.ld = ld i32* %a.shadow
+    %13 = const i32 2
+    %14 = add i32 %a.shadow.ld, %13
+    %15 = const time 0s 1e
+    drv i32$ %a, %14, %15
+    st i32* %a.shadow, %14
+    %b.shadow.ld = ld i32* %b.shadow
+    %16 = add i32 %b.shadow.ld, %9
+    drv i32$ %b, %16, %15
+    st i32* %b.shadow, %16
+    %op.shadow.ld = ld i1* %op.shadow
+    %17 = not i1 %op.shadow.ld
+    drv i1$ %op, %17, %15
+    st i1* %op.shadow, %17
+    %18 = const time 1ns
+    wait %19 for %18
+19:
+    %20 = prb i32$ %a
+    st i32* %a.shadow, %20
+    %21 = prb i1$ %op
+    st i1* %op.shadow, %21
+    %22 = prb i32$ %b
+    st i32* %b.shadow, %22
+    %op.shadow.ld1 = ld i1* %op.shadow
+    %23 = not i1 %op.shadow.ld1
+    %24 = const time 0s 1e
+    drv i1$ %op, %23, %24
+    st i1* %op.shadow, %23
+    %25 = const time 1ns
+    wait %26 for %25
+26:
+    %27 = prb i32$ %a
+    st i32* %a.shadow, %27
+    %28 = prb i1$ %op
+    st i1* %op.shadow, %28
+    %29 = prb i32$ %b
+    st i32* %b.shadow, %29
+    %30 = ld i32* %loop_count
+    st i32* %loop_count, %30
+    br %loop_body
+}
+
+entity @top () -> () {
+    %0 = const i32 0
+    %a = sig i32 %0
+    %b = sig i32 %0
+    %z = sig i32 %0
+    %1 = const i1 0
+    %op = sig i1 %1
+    inst @alu.param1 (i32$ %a, i32$ %b, i1$ %op) -> (i32$ %z)
+    inst %top.initial.207.0 () -> (i32$ %a, i32$ %b, i1$ %op)
+}

@@ -1,0 +1,6 @@
+[submodule "moore"]
+	path = moore
+	url = https://github.com/fabianschuiki/moore.git
+[submodule "llhd"]
+	path = llhd
+	url = https://github.com/fabianschuiki/llhd.git
