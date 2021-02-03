@@ -1,6 +1,6 @@
 # General Information
 
-The language specification is at http://llhd.io/spec.html#basic-blocks.
+The language specification is at http://llhd.io/spec.html.
 
 # The PLDI Artifact
 
