@@ -46,3 +46,8 @@ To run the simulator and generate a waveform file:
 
     cd examples
     llhd-sim alu.llhd -N 10000 -o alu.vcd
+
+To lower the behavioral LLHD to structural LLHD (I haven't experimented with this yet):
+
+    cd examples
+    llhd-opt --lower alu.llhd -o alu.llhd.str
